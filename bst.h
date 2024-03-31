@@ -250,6 +250,7 @@ protected:
 
     // Add helper functions here
     void clearHelper(Node<Key, Value>* node);
+    bool isBalancedHelper(Node<Key, Value>* node) const;
 
 
 protected:
@@ -550,7 +551,15 @@ template<typename Key, typename Value>
 Node<Key, Value>*
 BinarySearchTree<Key, Value>::getSmallestNode() const
 {
-    // TODO
+    Node<Key, Value>* currentNode = root_;
+
+    while(currentNode !=nullptr && currentNode->currentNode->getLeft() != nullptr){
+
+        currentNode = currentNode->getLeft();
+    }
+    
+    return currentNode;
+
 }
 
 /**
@@ -561,16 +570,48 @@ BinarySearchTree<Key, Value>::getSmallestNode() const
 template<typename Key, typename Value>
 Node<Key, Value>* BinarySearchTree<Key, Value>::internalFind(const Key& key) const
 {
-    // TODO
+    Node<Key, Value>* currentNode = root_;
+
+    while(currentNode != nullptr){
+        if(key < currentNode->getKey()){
+            currentNode = currentNode->getLeft();
+
+        }else if (key > currentNode->getKey()){
+            currentNode = currentNode->getRight();
+        }else{
+            return currentNode;
+        
+        }
+    }
+
+    return nullptr;
 }
 
 /**
  * Return true iff the BST is balanced.
  */
 template<typename Key, typename Value>
-bool BinarySearchTree<Key, Value>::isBalanced() const
-{
-    // TODO
+bool BinarySearchTree<Key, Value>::isBalanced() const {
+    return isBalancedHelper(root_);
+}
+
+
+template<typename Key, typename Value>
+bool BinarySearchTree<Key, Value>::isBalancedHelper(Node<Key, Value>* node) const {
+    if (node == nullptr) {
+        return true; // An empty tree is balanced
+    }
+
+    int leftHeight = height(node->getLeft());
+    int rightHeight = height(node->getRight());
+
+    if (abs(leftHeight - rightHeight) <= 1
+        && isBalancedHelper(node->getLeft())
+        && isBalancedHelper(node->getRight())) {
+        return true; // The current node is balanced and both subtrees are balanced
+    } else {
+        return false; // The current node or one of its subtrees is not balanced
+    }
 }
 
 
