@@ -520,6 +520,137 @@ void BinarySearchTree<Key, Value>::insert(const std::pair<const Key, Value> &key
 //     delete nodeToRemove;
 // }
 
+// //This is try 2 with no seagfaults
+// template<typename Key, typename Value>
+// void BinarySearchTree<Key, Value>::remove(const Key& key) {
+//     Node<Key, Value>* nodeToRemove = internalFind(key);
+//     if (!nodeToRemove) return; // Key not found, nothing to remove.
+
+//     // Node has two children
+//     if (nodeToRemove->getLeft() && nodeToRemove->getRight()) {
+//         Node<Key, Value>* successor = findMin(nodeToRemove->getRight());
+//         // Instead of setting key, swap the nodes' positions and remove the successor
+//         nodeToRemove->setValue(successor->getValue()); // Assuming values can be changed. If not, adjust as necessary.
+//         // Move the successor's right child up
+//         replaceNodeInParent(successor, successor->getRight());
+//         delete successor;
+//     }
+//     // Node has only one child or no child
+//     else {
+//         Node<Key, Value>* child = (nodeToRemove->getLeft() != nullptr) ? nodeToRemove->getLeft() : nodeToRemove->getRight();
+//         replaceNodeInParent(nodeToRemove, child);
+//         if (nodeToRemove == root_) {
+//             root_ = child;
+//         }
+//         delete nodeToRemove;
+//     }
+// }
+
+// template<typename Key, typename Value>
+// void BinarySearchTree<Key, Value>::replaceNodeInParent(Node<Key, Value>* node, Node<Key, Value>* newChild) {
+//     if (node->getParent()) {
+//         if (node == node->getParent()->getLeft()) {
+//             node->getParent()->setLeft(newChild);
+//         } else {
+//             node->getParent()->setRight(newChild);
+//         }
+//     }
+//     if (newChild) {
+//         newChild->setParent(node->getParent());
+//     }
+// }
+
+// template<typename Key, typename Value>
+// Node<Key, Value>* BinarySearchTree<Key, Value>::findMin(Node<Key, Value>* node) {
+//     while (node->getLeft() != nullptr) node = node->getLeft();
+//     return node;
+// }
+
+
+//try 3 
+// template<typename Key, typename Value>
+// void BinarySearchTree<Key, Value>::remove(const Key& key) {
+//     Node<Key, Value>* nodeToRemove = internalFind(key);
+//     if (!nodeToRemove) return; // Key not found, nothing to remove.
+
+//     // Node has two children
+//     if (nodeToRemove->getLeft() && nodeToRemove->getRight()) {
+//         // Use the predecessor helper function to find the predecessor
+//         Node<Key, Value>* predecessor = this->predecessor(nodeToRemove);
+//         // Swap the values
+//         Value tempValue = nodeToRemove->getValue();
+//         nodeToRemove->setValue(predecessor->getValue());
+//         predecessor->setValue(tempValue);
+//         // Focus on removing the predecessor which now contains the value to be removed
+//         nodeToRemove = predecessor;
+//     }
+
+//     // Node has 0 or 1 child
+//     Node<Key, Value>* child = (nodeToRemove->getLeft() != nullptr) ? nodeToRemove->getLeft() : nodeToRemove->getRight();
+//     if (child != nullptr) {
+//         child->setParent(nodeToRemove->getParent()); // Update child's parent
+//     }
+//     if (nodeToRemove == root_) {
+//         root_ = child;
+//     } else {
+//         Node<Key, Value>* parent = nodeToRemove->getParent();
+//         if (parent->getLeft() == nodeToRemove) {
+//             parent->setLeft(child);
+//         } else {
+//             parent->setRight(child);
+//         }
+//     }
+//     delete nodeToRemove;
+// }
+
+//try 4
+// template<typename Key, typename Value>
+// void BinarySearchTree<Key, Value>::remove(const Key& key) {
+//     Node<Key, Value>* nodeToRemove = internalFind(key);
+//     if (!nodeToRemove) return; // Key not found, nothing to remove.
+
+//     // Node has two children
+//     // Node has two children
+// if (nodeToRemove->getLeft() && nodeToRemove->getRight()) {
+//     // Find the predecessor (the largest node in the left subtree)
+//     Node<Key, Value>* pred = this->predecessor(nodeToRemove);
+//     if (!pred) return; // Safety check, though this situation shouldn't occur
+    
+//     // Swap values with the predecessor
+//     std::swap(nodeToRemove->getValue(), pred->getValue());
+
+//     // Recursively call remove on the predecessor, which now contains the original node's value
+//     this->remove(pred->getKey());
+// }
+
+//     // Node has only one child or no child
+//     else {
+//         Node<Key, Value>* child = (nodeToRemove->getLeft() != nullptr) ? nodeToRemove->getLeft() : nodeToRemove->getRight();
+        
+//         // If the node is not root, set the parent's appropriate child pointer
+//         if (nodeToRemove->getParent()) {
+//             if (nodeToRemove == nodeToRemove->getParent()->getLeft()) {
+//                 nodeToRemove->getParent()->setLeft(child);
+//             } else {
+//                 nodeToRemove->getParent()->setRight(child);
+//             }
+//         }
+        
+//         // Update child's parent pointer
+//         if (child) {
+//             child->setParent(nodeToRemove->getParent());
+//         }
+        
+//         // If the node to remove is the root, update the root pointer
+//         if (nodeToRemove == root_) {
+//             root_ = child;
+//         }
+        
+//         delete nodeToRemove;
+//     }
+// }
+
+//try 5
 template<typename Key, typename Value>
 void BinarySearchTree<Key, Value>::remove(const Key& key) {
     Node<Key, Value>* nodeToRemove = internalFind(key);
@@ -527,43 +658,44 @@ void BinarySearchTree<Key, Value>::remove(const Key& key) {
 
     // Node has two children
     if (nodeToRemove->getLeft() && nodeToRemove->getRight()) {
-        Node<Key, Value>* successor = findMin(nodeToRemove->getRight());
-        // Instead of setting key, swap the nodes' positions and remove the successor
-        nodeToRemove->setValue(successor->getValue()); // Assuming values can be changed. If not, adjust as necessary.
-        // Move the successor's right child up
-        replaceNodeInParent(successor, successor->getRight());
-        delete successor;
+        // Find the predecessor (the largest node in the left subtree)
+        Node<Key, Value>* pred = predecessor(nodeToRemove);
+        if (!pred) return; // Safety check, though this situation shouldn't occur
+        std::cout << "pred: " << pred->getKey() << std::endl;
+
+        // Swap values with the predecessor to maintain BST properties
+        // Value tempValue = nodeToRemove->getValue();
+        // nodeToRemove->setValue(pred->getValue());
+        // pred->setValue(tempValue);
+        nodeSwap(nodeToRemove, pred);
+
+        // Now focus on removing the predecessor node which is now in place of the original nodeToRemove
+       //nodeToRemove = pred;
     }
+
     // Node has only one child or no child
-    else {
-        Node<Key, Value>* child = (nodeToRemove->getLeft() != nullptr) ? nodeToRemove->getLeft() : nodeToRemove->getRight();
-        replaceNodeInParent(nodeToRemove, child);
-        if (nodeToRemove == root_) {
-            root_ = child;
-        }
-        delete nodeToRemove;
-    }
-}
+    Node<Key, Value>* child = (nodeToRemove->getLeft() != nullptr) ? nodeToRemove->getLeft() : nodeToRemove->getRight();
 
-template<typename Key, typename Value>
-void BinarySearchTree<Key, Value>::replaceNodeInParent(Node<Key, Value>* node, Node<Key, Value>* newChild) {
-    if (node->getParent()) {
-        if (node == node->getParent()->getLeft()) {
-            node->getParent()->setLeft(newChild);
+    if (nodeToRemove == root_) {
+        root_ = child; // Update root if necessary
+    } else {
+        Node<Key, Value>* parent = nodeToRemove->getParent();
+        if (parent->getLeft() == nodeToRemove) {
+            parent->setLeft(child); // Set the correct child on the parent
         } else {
-            node->getParent()->setRight(newChild);
+            parent->setRight(child);
         }
     }
-    if (newChild) {
-        newChild->setParent(node->getParent());
+
+    if (child) {
+        child->setParent(nodeToRemove->getParent()); // Update the child's parent pointer
     }
+
+    delete nodeToRemove; // Safely delete the node
 }
 
-template<typename Key, typename Value>
-Node<Key, Value>* BinarySearchTree<Key, Value>::findMin(Node<Key, Value>* node) {
-    while (node->getLeft() != nullptr) node = node->getLeft();
-    return node;
-}
+
+
 
 
 
